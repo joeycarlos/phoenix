@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour, IDamageable {
 
     [SerializeField] float projectileVerticalOffset = 1.7f;
     [SerializeField] float projectileHorizontalOffset = 1.5f;
-    [SerializeField] float initialProjectileForce = 30f;
+    [SerializeField] float initialProjectileForce = 0.1f;
     [SerializeField] float timeBetweenShots = 0.5f;
     [SerializeField] float damagePerShot = 20f;
     [SerializeField] GameObject projectile;

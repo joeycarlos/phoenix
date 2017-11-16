@@ -98,7 +98,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1389663933945134}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10, y: 0.5, z: 10}
+  m_LocalPosition: {x: 1.1371706, y: 0.5, z: 13.039321}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4376185257160258}
@@ -242,9 +242,9 @@ MonoBehaviour:
   maxHealth: 100
   moveSpeed: 5
   target: {fileID: 0}
-  projectileVerticalOffset: 2
+  projectileVerticalOffset: 1
   projectileHorizontalOffset: 2
-  initialProjectileForce: 30
+  initialProjectileForce: 0.3
   timeBetweenShots: 2
   damagePerShot: 20
   projectile: {fileID: 1411613224105860, guid: 1c1908576b1da5e4eb9d13f70be8592e, type: 2}

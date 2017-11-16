@@ -256,8 +256,9 @@ public class Player : MonoBehaviour, IDamageable {
         clone.GetComponent<Projectile>().SetShooter(gameObject);
 
         // Shoot projectile
-        Rigidbody rb = clone.GetComponent<Rigidbody>();
-        rb.AddForce(transform.forward * initialProjectileForce, ForceMode.Impulse);
+        Rigidbody rbClone = clone.GetComponent<Rigidbody>();
+        rbClone.AddForce(transform.forward * initialProjectileForce, ForceMode.Impulse);
+        
 
         // Reset shot recharge countdown
         timeUntilNextShot = timeBetweenShots;
