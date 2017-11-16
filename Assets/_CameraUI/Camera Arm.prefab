@@ -156,7 +156,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   turnSpeed: 2.5
-  maxVerticalTilt: 60
+  maxVerticalTilt: 55
   minVerticalTilt: 45
 --- !u!124 &124689693348090894
 Behaviour:

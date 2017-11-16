@@ -42,7 +42,6 @@ public class Player : MonoBehaviour, IDamageable {
     [SerializeField] float maxHealth = 100f;
     [SerializeField] float energyRegenerationPerSecond = 3f;
     [SerializeField] float healthRegenerationPerSecond = 5f;
-    [SerializeField] float lowEnergyPercentageThreshold = 0.01f;
 
     // ----- PRIVATE VARIABLES -----
 
@@ -104,15 +103,16 @@ public class Player : MonoBehaviour, IDamageable {
         UpdateResources();
 
         // Read input
-        if (Input.GetKey(KeyCode.Space) && isGrounded && !inDodgeState && GetCurrentEnergyAsPercentage() > lowEnergyPercentageThreshold)    { ChargeJump(); }
+        if (Input.GetKey(KeyCode.Space) && isGrounded && !inDodgeState)                                                                     { ChargeJump(); }
         if (Input.GetKeyUp(KeyCode.Space) && isGrounded)                                                                                    { ExecuteJump(); }
         if (Input.GetKey(KeyCode.Mouse0) && timeUntilNextShot <= 0 && !inChargeJumpState && !inDodgeState)                                  { ShootProjectile(); }
         if (Input.GetKeyDown(KeyCode.LeftShift) && !inChargeJumpState && currentEnergy >= dodgeEnergyCost)                                  { EnterDodgeState(); }
         ReadMovementInput();
 
         // Adjust movement
-        if (GetCurrentEnergyAsPercentage() > lowEnergyPercentageThreshold) UpdateAerialDrag();
-        ReduceGlidingGravity();
+        ResetDrag();
+        if (currentEnergy > 0) UpdateAerialDrag();
+        if (!isGrounded && inDodgeState) ReduceAerialDodgeGravity();
         CalculateMoveVector();
 
         // Move and rotate the player
@@ -135,7 +135,7 @@ public class Player : MonoBehaviour, IDamageable {
     private void CalculateMoveVector()
     {
         
-        float maxVectorMagnitude = verticalMoveSpeed;
+        float maxVectorMagnitude = verticalMoveSpeed * Time.deltaTime;
 
         // Calculate horizontal move vector component
         float horizontalMagnitude = horizontalInput * Time.deltaTime * horizontalMoveSpeed;
@@ -160,8 +160,6 @@ public class Player : MonoBehaviour, IDamageable {
     private void UpdateAerialDrag()
     {
         
-        rb.drag = 0;
-
         if (!isGrounded && rb.velocity.y < 0 && !inDodgeState)
         {
 
@@ -174,12 +172,9 @@ public class Player : MonoBehaviour, IDamageable {
         
     }
 
-    private void ReduceGlidingGravity()
+    private void ReduceAerialDodgeGravity()
     {
-        if (!isGrounded && inDodgeState)
-        {
-            rb.AddForce(Vector3.up * GRAVITY_FORCE, ForceMode.Force);
-        }
+        rb.AddForce(Vector3.up * GRAVITY_FORCE, ForceMode.Force);
     }
 
     private void MovePlayer()
@@ -192,6 +187,11 @@ public class Player : MonoBehaviour, IDamageable {
         // rotate player to match camera free look rotation
         Quaternion cameraRotation = Quaternion.LookRotation(cameraTransform.forward, cameraTransform.up);
         transform.rotation = cameraRotation;
+    }
+
+    private void ResetDrag()
+    {
+        rb.drag = 0;
     }
 
 
@@ -295,8 +295,13 @@ public class Player : MonoBehaviour, IDamageable {
         currentHealth += healthRegenerationPerSecond * Time.deltaTime;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-        currentEnergy += energyRegenerationPerSecond * Time.deltaTime;
-        currentEnergy = Mathf.Clamp(currentEnergy, 0, maxHealth);
+        // only regenerate health if on ground
+        if (isGrounded)
+        {
+            currentEnergy += energyRegenerationPerSecond * Time.deltaTime;
+            currentEnergy = Mathf.Clamp(currentEnergy, 0, maxEnergy);
+        }
+
     }
 
     public void TakeDamage(float damage)
