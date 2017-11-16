@@ -21,9 +21,7 @@ public class Player : MonoBehaviour, IDamageable {
     [SerializeField] float chargeJumpEnergyCost = 3f;
 
     // GLIDING VARIABLES
-    [SerializeField] float backGlideDrag = 10f;
-    [SerializeField] float frontGlideDrag = 5f;
-    [SerializeField] float sideGlideDrag = 5f;
+    [SerializeField] float glideDrag = 1000f;
     [SerializeField] float glideEnergyCost = 20f;
 
     // DODGE VARIABLES
@@ -72,6 +70,10 @@ public class Player : MonoBehaviour, IDamageable {
     // STATE VECTOR
     private Vector3 moveVector;
 
+    // ----- PRIVATE VARIABLES -----
+
+    // EXTERNAL REFERENCES
+    private const float GRAVITY_FORCE = 9.81f;
 
     // ----- MAIN FLOW ----- 
 
@@ -110,6 +112,7 @@ public class Player : MonoBehaviour, IDamageable {
 
         // Adjust movement
         if (GetCurrentEnergyAsPercentage() > lowEnergyPercentageThreshold) UpdateAerialDrag();
+        ReduceGlidingGravity();
         CalculateMoveVector();
 
         // Move and rotate the player
@@ -131,6 +134,9 @@ public class Player : MonoBehaviour, IDamageable {
 
     private void CalculateMoveVector()
     {
+        
+        float maxVectorMagnitude = verticalMoveSpeed;
+
         // Calculate horizontal move vector component
         float horizontalMagnitude = horizontalInput * Time.deltaTime * horizontalMoveSpeed;
         Vector3 playerRightDirection = Vector3.Scale(transform.right, new Vector3(1, 0, 1)).normalized;
@@ -141,34 +147,38 @@ public class Player : MonoBehaviour, IDamageable {
 
         // Calculate resultant vector
         moveVector = verticalMagnitude * playerForwardDirection + horizontalMagnitude * playerRightDirection;
-        moveVector = Vector3.ClampMagnitude(moveVector, verticalMoveSpeed);                                     // Ensure diagonal speed is capped at forward speed
+        moveVector = Vector3.ClampMagnitude(moveVector, maxVectorMagnitude);                                     // Ensure diagonal speed is capped at forward speed
 
         // Adjust move vector for special cases
         if (verticalInput < 0 && !inDodgeState) moveVector = moveVector / backwardsMovementDivisor;             // Reduce backwards movement
         if (inDodgeState) { moveVector = moveVector * dodgeSpeedMultiplier; }                                   // Increase movement speed if dodging
         if (inChargeJumpState) { moveVector = moveVector / chargeJumpSpeedDivisor; }                            // Reduce movement speed if charging a jump
+       
     }
 
     // Increase drag if descending and not dodging -- to emulate gliding
     private void UpdateAerialDrag()
     {
+        
         rb.drag = 0;
 
         if (!isGrounded && rb.velocity.y < 0 && !inDodgeState)
         {
-            
-            if (verticalInput == 1) {                                       // forward glide -- most energy cost
-                rb.drag = frontGlideDrag;
+
+            if (verticalInput == 1 || verticalInput == -1 || horizontalInput == 1 || horizontalInput == -1)
+            {                                    
+                rb.drag = glideDrag;
                 currentEnergy = Mathf.Clamp(currentEnergy - (glideEnergyCost * Time.deltaTime), 0, maxEnergy);
             }
-            else if (verticalInput == -1) {                                 // backward glide -- least energy cost
-                rb.drag = backGlideDrag;
-                currentEnergy = Mathf.Clamp(currentEnergy - (glideEnergyCost * 0.5f * Time.deltaTime), 0, maxEnergy);
-            }      
-            else if ((horizontalInput == -1 || horizontalInput == 1)) {     // side glide -- medium energy cost
-                rb.drag = sideGlideDrag;
-                currentEnergy = Mathf.Clamp(currentEnergy - (glideEnergyCost * 0.75f * Time.deltaTime), 0, maxEnergy);
-            }      
+        }
+        
+    }
+
+    private void ReduceGlidingGravity()
+    {
+        if (!isGrounded && inDodgeState)
+        {
+            rb.AddForce(Vector3.up * GRAVITY_FORCE, ForceMode.Force);
         }
     }
 
@@ -308,7 +318,7 @@ public class Player : MonoBehaviour, IDamageable {
 
     private void UpdateGrounded()
     {
-        float radius = capsuleCollider.radius * 0.9f;
+        float radius = capsuleCollider.radius * 0.95f;
         // Check against default layer
         int layerMask = 1 << 0;
 
@@ -320,7 +330,7 @@ public class Player : MonoBehaviour, IDamageable {
 
     private void OnDrawGizmosSelected()
     {
-        float radius = capsuleCollider.radius * 0.9f;
+        float radius = capsuleCollider.radius * 0.95f;
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position + Vector3.up*(radius - 0.2f), radius);
