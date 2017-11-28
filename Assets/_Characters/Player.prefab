@@ -1075,7 +1075,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1512464932510258}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.85, z: 0}
+  m_LocalPosition: {x: 0, y: -0.382, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4897225113491222}
@@ -1741,7 +1741,7 @@ MonoBehaviour:
   dodgeEnergyCost: 20
   projectileVerticalOffset: 1.7
   projectileHorizontalOffset: 1
-  initialProjectileForce: 20
+  initialProjectileForce: 0.3
   timeBetweenShots: 0.3
   damagePerShot: 10
   projectile: {fileID: 1411613224105860, guid: 1c1908576b1da5e4eb9d13f70be8592e, type: 2}

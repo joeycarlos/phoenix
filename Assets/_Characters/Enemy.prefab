@@ -20,7 +20,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4376185257160258}
   - component: {fileID: 114690546623872032}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: UI Socket
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 33959090785478426}
   - component: {fileID: 65024141909961790}
   - component: {fileID: 23663026015553244}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 23464427725606260}
   - component: {fileID: 54913051590077160}
   - component: {fileID: 114769723859445618}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1389663933945134}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.1371706, y: 0.5, z: 13.039321}
+  m_LocalPosition: {x: 0.47010547, y: 1.7, z: -5.1877584}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4376185257160258}
@@ -240,7 +240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
-  moveSpeed: 5
+  moveSpeed: 1
   target: {fileID: 0}
   projectileVerticalOffset: 1
   projectileHorizontalOffset: 2
