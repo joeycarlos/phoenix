@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour, IDamageable {
+public class FlyingEnemy : MonoBehaviour, IDamageable {
 
     [SerializeField] float maxHealth = 100f;
     [SerializeField] float moveSpeed = 2f;
@@ -30,12 +30,53 @@ public class Enemy : MonoBehaviour, IDamageable {
 	void Update () {
         DecrementShootingCooldown();
         if (timeUntilNextShot <= 0 && TargetWithinRadius()) { ShootProjectileAtTarget(target); }
-        ChaseTarget();
+
+        LookAtTarget();
+        if (CheckPathToTarget()) ChaseTarget();
+    }
+
+    private bool CheckPathToTarget()
+    {
+        Vector3 targetDirection = target.transform.position - this.transform.position;
+
+        int layerMask;
+        RaycastHit hit;
+        float distanceToPlayer = Mathf.Infinity;
+        float distanceToObstacle = Mathf.Infinity;
+
+        // raycast against player
+        layerMask = 1 << 8;
+        if (Physics.Raycast(this.transform.position, targetDirection, out hit, 50f, layerMask))
+        {
+            print("Hit the player!");
+            distanceToPlayer = hit.distance;
+        }
+            
+
+        // raycast against default obstacles
+        layerMask = 1 << 0;
+        if (Physics.Raycast(this.transform.position, targetDirection, out hit, 50f, layerMask))
+            distanceToObstacle = hit.distance;
+
+        if (distanceToObstacle > distanceToPlayer)
+        {
+            return true;
+        }
+        else return false;
+
+            // compare distances
+            // if player is closer, then return true
+            // if obstacle is closer, then return false
+            // if neither, return false
+    }
+
+    private void LookAtTarget()
+    {
+        transform.LookAt(target.transform);
     }
 
     private void ChaseTarget()
     {
-        transform.LookAt(target.transform);
         transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 
@@ -76,5 +117,11 @@ public class Enemy : MonoBehaviour, IDamageable {
     private void DecrementShootingCooldown()
     {
         timeUntilNextShot -= Time.deltaTime;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, target.transform.position);
     }
 }

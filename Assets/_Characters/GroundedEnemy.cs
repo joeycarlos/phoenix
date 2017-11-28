@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GroundedEnemy : MonoBehaviour, IDamageable {
 
@@ -21,11 +22,22 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
     private Vector3 moveVector;
     private float timeUntilNextShot;
 
+    NavMeshAgent navMeshAgent;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         currentHealth = maxHealth;
         target = GameObject.FindGameObjectWithTag("Player"); ;
+        navMeshAgent = this.GetComponent<NavMeshAgent>();
+
+        if (navMeshAgent == null)
+        {
+            Debug.LogError("Nav mesh agent component is not attached");
+        } else
+        {
+            SetDestination();
+        }
     }
 
     void Update()
@@ -36,23 +48,16 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
 
     void LateUpdate()
     {
-        ChaseTarget();
+        SetDestination();
     }
 
-    private void ChaseTarget()
+    private void SetDestination()
     {
-        Vector3 lookAtGoal = new Vector3(target.transform.position.x, this.transform.position.y, target.transform.position.z);
-
-        // create a unit vector to check if path ahead is grounded
-        Vector3 unitVectorToGoal = new Vector3(target.transform.position.x - this.transform.position.x, 0, target.transform.position.z - this.transform.position.z);
-        unitVectorToGoal = Vector3.Normalize(unitVectorToGoal);
-
-        if (IsGrounded(unitVectorToGoal*2 + this.transform.position))
+        if (target != null)
         {
-            transform.LookAt(lookAtGoal);
-            this.transform.Translate(0, 0, moveSpeed * Time.deltaTime);
-        } 
-
+            Vector3 targetVector = target.transform.position;
+            navMeshAgent.SetDestination(targetVector);
+        }
     }
 
     private bool TargetWithinRadius()
@@ -76,14 +81,17 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
         // Define projectile spawn point relative to character
         Vector3 projectileSpawnPoint = transform.position + (transform.forward.normalized * projectileHorizontalOffset) + transform.up * projectileVerticalOffset;
 
+        // Define projectile shoot direction
+        Vector3 projectileDirection = Vector3.Normalize(target.transform.position - this.transform.position);
+
         // Create projectile
-        GameObject clone = Instantiate(projectile, projectileSpawnPoint, Quaternion.FromToRotation(Vector3.up, transform.forward)) as GameObject;
+        GameObject clone = Instantiate(projectile, projectileSpawnPoint, Quaternion.FromToRotation(Vector3.up, projectileDirection)) as GameObject;
         clone.GetComponent<Projectile>().SetDamage(damagePerShot);
         clone.GetComponent<Projectile>().SetShooter(gameObject);
 
         // Shoot projectile
         Rigidbody rb = clone.GetComponent<Rigidbody>();
-        rb.AddForce(transform.forward * initialProjectileForce, ForceMode.Impulse);
+        rb.AddForce(projectileDirection * initialProjectileForce, ForceMode.Impulse);
 
         // Reset shot recharge countdown
         timeUntilNextShot = timeBetweenShots;
@@ -94,22 +102,4 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
         timeUntilNextShot -= Time.deltaTime;
     }
 
-    private bool IsGrounded(Vector3 targetMovement)
-    {
-        float radius = 0.95f;
-        int layerMask = 1 << 0;
-
-        if (Physics.CheckSphere(targetMovement, radius, layerMask)) { print("true!");  return true; }
-        else return false;
-    }
-
-    /*
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = new Color(1, 0, 0, 0.5F);
-        Vector3 unitVectorToGoal = new Vector3(target.transform.position.x - this.transform.position.x, 0, target.transform.position.z - this.transform.position.z);
-        unitVectorToGoal = Vector3.Normalize(unitVectorToGoal);
-        Gizmos.DrawSphere(unitVectorToGoal*2 + this.transform.position, 0.95f);
-    }
-    */
 }
