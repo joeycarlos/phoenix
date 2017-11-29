@@ -12,8 +12,10 @@ public class TowerEnemy : MonoBehaviour, IDamageable {
     [SerializeField] float initialProjectileForce = 0.1f;
     [SerializeField] float timeBetweenShots = 0.5f;
     [SerializeField] float damagePerShot = 20f;
+    [SerializeField] float minimumTargetDistance = 10f;
+    [SerializeField] float damagePerSecond = 50f;
 
-    [SerializeField] GameObject projectile;
+    [SerializeField] GameObject laser;
     [SerializeField] float attackRadius = 30f;
 
     private float currentHealth;
@@ -23,12 +25,13 @@ public class TowerEnemy : MonoBehaviour, IDamageable {
     void Start () {
         currentHealth = maxHealth;
         target = GameObject.FindGameObjectWithTag("Player");
+        timeUntilNextShot = 0;
     }
 	
 	// Update is called once per frame
 	void Update () {
         DecrementShootingCooldown();
-        if (timeUntilNextShot <= 0 && TargetWithinAttackRadius()) { ShootProjectileAtTarget(target); }
+        if (timeUntilNextShot <= 0 && TargetWithinAttackRadius() && TargetBeyondMinimumDistance()) { ShootProjectileAtTarget(target); }
     }
 
     public void TakeDamage(float damage)
@@ -42,9 +45,14 @@ public class TowerEnemy : MonoBehaviour, IDamageable {
         return Vector3.Magnitude(target.transform.position - transform.position) <= attackRadius;
     }
 
+    private bool TargetBeyondMinimumDistance()
+    {
+        return Vector3.Magnitude(target.transform.position - transform.position) >= minimumTargetDistance;
+    }
+
     private void ShootProjectileAtTarget(GameObject currentTarget)
     {
-
+        
         // Define projectile spawn point relative to character
         Vector3 projectileSpawnPoint = 
             transform.position 
@@ -54,14 +62,12 @@ public class TowerEnemy : MonoBehaviour, IDamageable {
         // Define projectile shoot direction
         Vector3 projectileDirection = Vector3.Normalize(target.transform.position - projectileSpawnPoint);
 
-        // Create projectile
-        GameObject clone = Instantiate(projectile, projectileSpawnPoint, Quaternion.FromToRotation(Vector3.up, projectileDirection)) as GameObject;
-        clone.GetComponent<Projectile>().SetDamage(damagePerShot);
-        clone.GetComponent<Projectile>().SetShooter(gameObject);
-
-        // Shoot projectile
-        Rigidbody rb = clone.GetComponent<Rigidbody>();
-        rb.AddForce(projectileDirection * initialProjectileForce, ForceMode.Impulse);
+        // Create projectile laser marker
+        // Constantly shoot raycasts from the start position to the marker against the player layer
+        GameObject clone = Instantiate(laser, projectileSpawnPoint, Quaternion.FromToRotation(Vector3.up, projectileDirection)) as GameObject;
+        clone.GetComponent<Laser>().SetStartingPosition(projectileSpawnPoint);
+        clone.GetComponent<Laser>().SetLaserDirection(projectileDirection);
+        clone.GetComponent<Laser>().SetDamagePerSecond(damagePerSecond);
 
         // Reset shot recharge countdown
         timeUntilNextShot = timeBetweenShots;

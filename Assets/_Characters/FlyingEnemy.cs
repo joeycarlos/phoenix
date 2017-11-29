@@ -26,7 +26,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable {
     void Start () {
         rb = GetComponent<Rigidbody>();
         currentHealth = maxHealth;
-        target = GameObject.FindGameObjectWithTag("Player");;
+        target = GameObject.FindGameObjectWithTag("Player");
     }
 	
 	void Update () {
