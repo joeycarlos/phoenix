@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
-public class GroundedEnemy : MonoBehaviour, IDamageable {
+public class TowerEnemy : MonoBehaviour, IDamageable {
 
     [SerializeField] float maxHealth = 100f;
-    [SerializeField] float moveSpeed = 2f;
     [SerializeField] GameObject target;
 
     [SerializeField] float projectileVerticalOffset = 1.7f;
@@ -14,55 +12,23 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
     [SerializeField] float initialProjectileForce = 0.1f;
     [SerializeField] float timeBetweenShots = 0.5f;
     [SerializeField] float damagePerShot = 20f;
+
     [SerializeField] GameObject projectile;
     [SerializeField] float attackRadius = 30f;
 
-    private Rigidbody rb;
     private float currentHealth;
-    private Vector3 moveVector;
     private float timeUntilNextShot;
 
-    NavMeshAgent navMeshAgent;
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
+    // Use this for initialization
+    void Start () {
         currentHealth = maxHealth;
         target = GameObject.FindGameObjectWithTag("Player");
-        navMeshAgent = this.GetComponent<NavMeshAgent>();
-
-        if (navMeshAgent == null)
-        {
-            Debug.LogError("Nav mesh agent component is not attached");
-        } else
-        {
-            SetDestination();
-        }
     }
-
-    void Update()
-    {
+	
+	// Update is called once per frame
+	void Update () {
         DecrementShootingCooldown();
-        if (timeUntilNextShot <= 0 && TargetWithinRadius()) { ShootProjectileAtTarget(target); }
-    }
-
-    void LateUpdate()
-    {
-        SetDestination();
-    }
-
-    private void SetDestination()
-    {
-        if (target != null)
-        {
-            Vector3 targetVector = target.transform.position;
-            navMeshAgent.SetDestination(targetVector);
-        }
-    }
-
-    private bool TargetWithinRadius()
-    {
-        return Vector3.Magnitude(target.transform.position - transform.position) <= attackRadius;
+        if (timeUntilNextShot <= 0 && TargetWithinAttackRadius()) { ShootProjectileAtTarget(target); }
     }
 
     public void TakeDamage(float damage)
@@ -71,15 +37,19 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
         if (currentHealth <= 0) { Destroy(gameObject); }
     }
 
-    public float GetCurrentHealthAsPercentage()
+    private bool TargetWithinAttackRadius()
     {
-        return currentHealth / maxHealth;
+        return Vector3.Magnitude(target.transform.position - transform.position) <= attackRadius;
     }
 
     private void ShootProjectileAtTarget(GameObject currentTarget)
     {
+
         // Define projectile spawn point relative to character
-        Vector3 projectileSpawnPoint = transform.position + (transform.forward.normalized * projectileHorizontalOffset) + transform.up * projectileVerticalOffset;
+        Vector3 projectileSpawnPoint = 
+            transform.position 
+            + Vector3.Scale(target.transform.position - this.transform.position, new Vector3(1, 0, 1)).normalized * projectileHorizontalOffset 
+            + transform.up * projectileVerticalOffset;
 
         // Define projectile shoot direction
         Vector3 projectileDirection = Vector3.Normalize(target.transform.position - projectileSpawnPoint);
@@ -102,4 +72,8 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
         timeUntilNextShot -= Time.deltaTime;
     }
 
+    public float GetCurrentHealthAsPercentage()
+    {
+        return currentHealth / maxHealth;
+    }
 }
