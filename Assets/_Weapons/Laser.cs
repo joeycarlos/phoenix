@@ -59,7 +59,6 @@ public class Laser : MonoBehaviour {
 
         if (Physics.Raycast(startingPosition, laserDirection, out hit, laserEndMarker, layerMask))
         {
-            print("Laser hit!");
             return true;
         }
             

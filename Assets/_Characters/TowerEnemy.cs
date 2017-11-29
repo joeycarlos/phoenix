@@ -64,7 +64,7 @@ public class TowerEnemy : MonoBehaviour, IDamageable {
 
         // Create projectile laser marker
         // Constantly shoot raycasts from the start position to the marker against the player layer
-        GameObject clone = Instantiate(laser, projectileSpawnPoint, Quaternion.FromToRotation(Vector3.up, projectileDirection)) as GameObject;
+        GameObject clone = Instantiate(laser, projectileSpawnPoint, Quaternion.FromToRotation(Vector3.up, projectileDirection), this.transform) as GameObject;
         clone.GetComponent<Laser>().SetStartingPosition(projectileSpawnPoint);
         clone.GetComponent<Laser>().SetLaserDirection(projectileDirection);
         clone.GetComponent<Laser>().SetDamagePerSecond(damagePerSecond);
