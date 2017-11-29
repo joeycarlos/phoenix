@@ -82,7 +82,7 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
         Vector3 projectileSpawnPoint = transform.position + (transform.forward.normalized * projectileHorizontalOffset) + transform.up * projectileVerticalOffset;
 
         // Define projectile shoot direction
-        Vector3 projectileDirection = Vector3.Normalize(target.transform.position - this.transform.position);
+        Vector3 projectileDirection = Vector3.Normalize(target.transform.position - projectileSpawnPoint);
 
         // Create projectile
         GameObject clone = Instantiate(projectile, projectileSpawnPoint, Quaternion.FromToRotation(Vector3.up, projectileDirection)) as GameObject;

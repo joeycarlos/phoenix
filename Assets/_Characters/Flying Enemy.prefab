@@ -97,7 +97,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1389663933945134}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -5.7501564, y: -4.9, z: 21.287521}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -249,6 +249,7 @@ MonoBehaviour:
   damagePerShot: 20
   projectile: {fileID: 1411613224105860, guid: 1c1908576b1da5e4eb9d13f70be8592e, type: 2}
   attackRadius: 20
+  chaseRadius: 30
 --- !u!136 &136873436399153920
 CapsuleCollider:
   m_ObjectHideFlags: 1

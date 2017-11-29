@@ -15,6 +15,8 @@ public class FlyingEnemy : MonoBehaviour, IDamageable {
     [SerializeField] float damagePerShot = 20f;
     [SerializeField] GameObject projectile;
     [SerializeField] float attackRadius = 30f;
+    [SerializeField] float chaseRadius = 30f;
+    [SerializeField] float stoppingDistance = 10f;
 
     private Rigidbody rb;
     private float currentHealth;
@@ -29,10 +31,10 @@ public class FlyingEnemy : MonoBehaviour, IDamageable {
 	
 	void Update () {
         DecrementShootingCooldown();
-        if (timeUntilNextShot <= 0 && TargetWithinRadius()) { ShootProjectileAtTarget(target); }
+        if (timeUntilNextShot <= 0 && TargetWithinAttackRadius()) { ShootProjectileAtTarget(target); }
 
         LookAtTarget();
-        if (CheckPathToTarget()) ChaseTarget();
+        if (CheckPathToTarget() && TargetWithinChaseRadius() && TargetBeyondStoppingDistance()) ChaseTarget();
     }
 
     private bool CheckPathToTarget()
@@ -47,12 +49,8 @@ public class FlyingEnemy : MonoBehaviour, IDamageable {
         // raycast against player
         layerMask = 1 << 8;
         if (Physics.Raycast(this.transform.position, targetDirection, out hit, 50f, layerMask))
-        {
-            print("Hit the player!");
             distanceToPlayer = hit.distance;
-        }
             
-
         // raycast against default obstacles
         layerMask = 1 << 0;
         if (Physics.Raycast(this.transform.position, targetDirection, out hit, 50f, layerMask))
@@ -80,9 +78,19 @@ public class FlyingEnemy : MonoBehaviour, IDamageable {
         transform.position += transform.forward * moveSpeed * Time.deltaTime;
     }
 
-    private bool TargetWithinRadius()
+    private bool TargetWithinAttackRadius()
     {
         return Vector3.Magnitude(target.transform.position - transform.position) <= attackRadius;
+    }
+
+    private bool TargetWithinChaseRadius()
+    {
+        return Vector3.Magnitude(target.transform.position - transform.position) <= chaseRadius;
+    }
+
+    private bool TargetBeyondStoppingDistance()
+    {
+        return Vector3.Magnitude(target.transform.position - transform.position) >= stoppingDistance;
     }
 
     public void TakeDamage(float damage)
