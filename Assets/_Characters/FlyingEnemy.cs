@@ -17,6 +17,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable {
     [SerializeField] float attackRadius = 30f;
     [SerializeField] float chaseRadius = 30f;
     [SerializeField] float stoppingDistance = 10f;
+    [SerializeField] float scorePerKill = 10f;
 
     private Rigidbody rb;
     private float currentHealth;
@@ -96,7 +97,10 @@ public class FlyingEnemy : MonoBehaviour, IDamageable {
     public void TakeDamage(float damage)
     {
         currentHealth = Mathf.Clamp(currentHealth - damage, 0f, maxHealth);
-        if (currentHealth <= 0) { Destroy(gameObject); }
+        if (currentHealth <= 0) {
+            target.GetComponent<Player>().AddScore(scorePerKill);
+            Destroy(gameObject);
+        }
     }
 
     public float GetCurrentHealthAsPercentage()

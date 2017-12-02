@@ -16,6 +16,7 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
     [SerializeField] float damagePerShot = 20f;
     [SerializeField] GameObject projectile;
     [SerializeField] float attackRadius = 30f;
+    [SerializeField] float scorePerKill = 5f;
 
     private Rigidbody rb;
     private float currentHealth;
@@ -68,7 +69,10 @@ public class GroundedEnemy : MonoBehaviour, IDamageable {
     public void TakeDamage(float damage)
     {
         currentHealth = Mathf.Clamp(currentHealth - damage, 0f, maxHealth);
-        if (currentHealth <= 0) { Destroy(gameObject); }
+        if (currentHealth <= 0) {
+            target.GetComponent<Player>().AddScore(scorePerKill);
+            Destroy(gameObject);
+        }
     }
 
     public float GetCurrentHealthAsPercentage()

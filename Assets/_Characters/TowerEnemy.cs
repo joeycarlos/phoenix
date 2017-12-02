@@ -18,6 +18,8 @@ public class TowerEnemy : MonoBehaviour, IDamageable {
     [SerializeField] GameObject laser;
     [SerializeField] float attackRadius = 30f;
 
+    [SerializeField] float scorePerKill = 15f;
+
     private float currentHealth;
     private float timeUntilNextShot;
 
@@ -37,7 +39,10 @@ public class TowerEnemy : MonoBehaviour, IDamageable {
     public void TakeDamage(float damage)
     {
         currentHealth = Mathf.Clamp(currentHealth - damage, 0f, maxHealth);
-        if (currentHealth <= 0) { Destroy(gameObject); }
+        if (currentHealth <= 0) {
+            target.GetComponent<Player>().AddScore(scorePerKill);
+            Destroy(gameObject);
+        }
     }
 
     private bool TargetWithinAttackRadius()

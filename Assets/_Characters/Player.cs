@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityStandardAssets.CrossPlatformInput;
 
 public class Player : MonoBehaviour, IDamageable {
@@ -43,6 +44,11 @@ public class Player : MonoBehaviour, IDamageable {
     [SerializeField] float energyRegenerationPerSecond = 3f;
     [SerializeField] float healthRegenerationPerSecond = 5f;
 
+    // UI VARIABLES
+    [SerializeField] Text scoreText;
+    [SerializeField] Text attackLevelText;
+    [SerializeField] Text movementLevelText;
+
     // ----- PRIVATE VARIABLES -----
 
     // EXTERNAL REFERENCES
@@ -50,6 +56,7 @@ public class Player : MonoBehaviour, IDamageable {
     private Rigidbody rb;
     private Transform cameraTransform;
     private CapsuleCollider capsuleCollider;
+
 
     // INPUT AXIS
     private float horizontalInput;
@@ -65,6 +72,9 @@ public class Player : MonoBehaviour, IDamageable {
     private float currentJumpForce;
     private float currentEnergy;
     private float currentHealth;
+    private float currentScore;
+    private int attackLevel;
+    private int movementLevel;
 
     // STATE VECTOR
     private Vector3 moveVector;
@@ -90,6 +100,10 @@ public class Player : MonoBehaviour, IDamageable {
         isGrounded = false;
         currentEnergy = maxEnergy;
         currentHealth = maxHealth;
+        currentScore = 0;
+
+        attackLevel = 0;
+        movementLevel = 0;
 
         currentJumpForce = minJumpForce;
         timeUntilNextShot = 0;
@@ -103,10 +117,10 @@ public class Player : MonoBehaviour, IDamageable {
         UpdateResources();
 
         // Read input
-        if (Input.GetKey(KeyCode.Space) && isGrounded && !inDodgeState)                                                                     { ChargeJump(); }
-        if (Input.GetKeyUp(KeyCode.Space) && isGrounded)                                                                                    { ExecuteJump(); }
-        if (Input.GetKey(KeyCode.Mouse0) && timeUntilNextShot <= 0 && !inChargeJumpState && !inDodgeState)                                  { ShootProjectile(); }
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !inChargeJumpState && currentEnergy >= dodgeEnergyCost)                                  { EnterDodgeState(); }
+        if (Input.GetKey(KeyCode.Space) && isGrounded && !inDodgeState)                                        { ChargeJump(); }
+        if (Input.GetKeyUp(KeyCode.Space) && isGrounded)                                                       { ExecuteJump(); }
+        if (Input.GetKey(KeyCode.Mouse0) && timeUntilNextShot <= 0 && !inChargeJumpState && !inDodgeState)     { ShootProjectile(); }
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !inChargeJumpState && currentEnergy >= dodgeEnergyCost)     { EnterDodgeState(); }
         ReadMovementInput();
 
         // Adjust movement
@@ -308,6 +322,60 @@ public class Player : MonoBehaviour, IDamageable {
     public void TakeDamage(float damage)
     {
         currentHealth = Mathf.Clamp(currentHealth - damage, 0f, maxHealth);
+        if (currentHealth == 0)
+        {
+            DeathEvent();
+        }
+    }
+
+    // ----- DEATH HELPER FUNCTIONS -----
+
+    private void DeathEvent()
+    {
+        print("YOU DIED!");
+        Application.LoadLevel(Application.loadedLevel);
+    }
+
+    // ----- POWER UP HELPER FUNCTIONS -----
+    void OnTriggerEnter(Collider other)
+    {
+        print("Enter trigger!");
+
+        // POWER-UPS
+        if (other.gameObject.layer == 10)
+        {
+            int powerUpType = other.gameObject.GetComponentInParent<PowerUp>().GetPowerUpType();
+
+            // check which type of power-up
+            if ( powerUpType == 1)
+            {
+                this.TakeDamage(-100f);
+            }
+
+            if ( powerUpType == 2)
+            {
+                damagePerShot += 5f;
+                attackLevel += 1;
+                attackLevelText.text = "Attack Level: " + attackLevel;
+            }
+            
+            if ( powerUpType == 3)
+            {
+                horizontalMoveSpeed += 0.5f;
+                verticalMoveSpeed += 0.5f;
+                movementLevel += 1;
+                movementLevelText.text = "Movement Level: " + movementLevel;
+            }
+            Destroy(other.gameObject);
+        }
+    }
+
+    // ----- SCORE HELPER FUNCTIONS -----
+    public void AddScore(float score)
+    {
+        currentScore += score;
+        // Update score in UI
+        scoreText.text = "Score: " + currentScore;
     }
 
     // ----- ANIMATOR HELPER FUNCTIONS -----

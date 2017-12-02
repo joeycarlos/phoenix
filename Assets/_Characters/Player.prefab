@@ -1075,7 +1075,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1512464932510258}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.382, z: 0}
+  m_LocalPosition: {x: 0, y: 1.71, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4897225113491222}
@@ -1726,19 +1726,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 929ad4aaebc33b241abb815b78c8a779, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalMoveSpeed: 6
-  verticalMoveSpeed: 7
-  backwardsMovementDivisor: 5
+  horizontalMoveSpeed: 4
+  verticalMoveSpeed: 5
+  backwardsMovementDivisor: 10
   minJumpForce: 4
   maxJumpForce: 20
   jumpChargeRate: 5
   chargeJumpSpeedDivisor: 3
-  chargeJumpEnergyCost: 20
+  chargeJumpEnergyCost: 0
   glideDrag: 1000
-  glideEnergyCost: 5
+  glideEnergyCost: 3
   dodgeStateTime: 0.5
-  dodgeSpeedMultiplier: 4
-  dodgeEnergyCost: 20
+  dodgeSpeedMultiplier: 3
+  dodgeEnergyCost: 0
   projectileVerticalOffset: 1.7
   projectileHorizontalOffset: 1
   initialProjectileForce: 0.3
@@ -1748,7 +1748,8 @@ MonoBehaviour:
   maxEnergy: 100
   maxHealth: 100
   energyRegenerationPerSecond: 5
-  healthRegenerationPerSecond: 5
+  healthRegenerationPerSecond: 0
+  scoreText: {fileID: 0}
   animator: {fileID: 0}
 --- !u!136 &136445670982651460
 CapsuleCollider:
@@ -1760,9 +1761,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.3
-  m_Height: 1.318222
+  m_Height: 1.3799117
   m_Direction: 1
-  m_Center: {x: 0, y: 0.6948185, z: 0}
+  m_Center: {x: 0, y: 0.6639737, z: 0}
 --- !u!137 &137872894315439316
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

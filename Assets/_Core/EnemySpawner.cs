@@ -29,7 +29,7 @@ public class EnemySpawner : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        timeUntilNextSpawn = 0f;
+        timeUntilNextSpawn = RenewSpawnTimer();
         probabilities = new float[3] { groundedPercentage, aerialPercentage, towerPercentage };
 	}
 	
